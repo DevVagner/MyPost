@@ -1,0 +1,78 @@
+<div class="panel panel-default">
+<div class="panel-heading">
+  <h4 class="panel-title">
+    <a data-toggle="collapse" data-parent="#accordion" href="#mail_settings">
+    <i class="fa fa-envelope" aria-hidden="true"></i>
+	<span>{{ l('Mail settings') }}</span></a>
+  </h4>
+</div>
+<div id="mail_settings" class="panel-collapse collapse">
+	<div class="panel-body">
+
+		<div class="row">
+			<div class="col-md-6">
+				<div class="input-group">
+					{% set mail_protocol = input_post("mail_protocol") is not empty ? input_post("mail_protocol") : app_settings["mail_protocol"] %}
+					<label for="mail_protocol">{{ l('Mail protocol') }}</label>
+					<select name="mail_protocol" id="mail_protocol" class="form-control">
+						<option value="mail" {% if mail_protocol == "mail" %}selected{% endif %}>{{l("Mail")}}</option>
+						<option value="smtp" {% if mail_protocol == "smtp" %}selected{% endif %}>{{l("SMTP")}}</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="col-md-6 smtpOption">
+				<div class="input-group">
+					{% set mail_smtp_host = input_post("mail_smtp_host") is not empty ? input_post("mail_smtp_host") : app_settings["mail_smtp_host"] %}
+					<label for="mail_smtp_host">{{ l('SMTP host') }}</label>
+					<input type="text" name="mail_smtp_host" class="form-control" id="mail_smtp_host" placeholder="{{ l('SMTP host') }}" value="{{ mail_smtp_host }}" />
+				</div>
+			</div>
+
+			<div class="col-md-6 smtpOption">
+				<div class="input-group">
+					{% set mail_smtp_user = input_post("mail_smtp_user") is not empty ? input_post("mail_smtp_user") : app_settings["mail_smtp_user"] %}
+					<label for="mail_smtp_user">{{ l('SMTP user') }}</label>
+					<input type="text" name="mail_smtp_user" class="form-control" id="mail_smtp_user" placeholder="{{ l('SMTP user') }}" value="{{ mail_smtp_user }}" />
+				</div>
+			</div>
+
+			<div class="col-md-6 smtpOption">
+				<div class="input-group">
+					{% set mail_smtp_pass = input_post("mail_smtp_pass") is not empty ? input_post("mail_smtp_pass") : app_settings["mail_smtp_pass"] %}
+					<label for="mail_smtp_pass">{{ l('SMTP pass') }}</label>
+					<input type="text" name="mail_smtp_pass" class="form-control" id="mail_smtp_pass" placeholder="{{ l('SMTP pass') }}" value="{{ mail_smtp_pass }}" />
+				</div>
+			</div>
+
+			<div class="col-md-6 smtpOption">
+				<div class="input-group">
+					{% set mail_smtp_port = input_post("mail_smtp_port") is not empty ? input_post("mail_smtp_port") : app_settings["mail_smtp_port"] %}
+					<label for="mail_smtp_port">{{ l('SMTP port') }}</label>
+					<input type="text" name="mail_smtp_port" class="form-control" id="mail_smtp_port" placeholder="{{ l('SMTP port') }}" value="{{ mail_smtp_port }}" />
+				</div>
+			</div>
+
+			<div class="col-md-6 smtpOption">
+				<div class="input-group">
+					{% set mail_smtp_crypto = input_post("mail_smtp_crypto") is not empty ? input_post("mail_smtp_crypto") : app_settings["mail_smtp_crypto"] %}
+					<label for="mail_smtp_crypto">{{ l('SMTP encryption') }}</label>
+					<input type="text" name="mail_smtp_crypto" class="form-control" id="mail_smtp_crypto" placeholder="{{ l('SMTP encryption') }}" value="{{ mail_smtp_crypto }}" />
+				</div>
+			</div>
+		</div>
+
+		<input type="submit" name="save" value="{{ l('SAVE_CHANGES') }}" class="btn btn-primary" />		
+	</div>
+</div>
+</div>
+<script type="text/javascript">
+	$(function(){
+
+		if($("#mail_protocol").val() == "smtp"){$(".smtpOption").show()}else{$(".smtpOption").hide()}
+		
+		$("#mail_protocol").on("change",function(){
+			if($(this).val() == "smtp"){$(".smtpOption").show()}else{$(".smtpOption").hide()}
+		});
+	});
+</script>

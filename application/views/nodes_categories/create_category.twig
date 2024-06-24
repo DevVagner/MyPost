@@ -1,0 +1,102 @@
+<div id="addNewCatModal" class="modal fade" role="dialog" data-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">{{ l("Create new category") }}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="addNewCatModalMsgBox"></div>
+				{% set fbacounts = fbaccount.getAll() %}
+					{% if fbacounts is not empty %}
+						<select id="facebook-accounts" name="facebook-accounts" class="form-control">
+								{% for fba in fbacounts %}
+									<option value="{{ fba.fb_id }}" {% if fbaccount.UserDefaultFbAccount() ==  fba.fb_id %}selected{% endif %}>{{ fba.name }}</option>
+								{% endfor %}
+						</select>
+					{% else %}
+							<li><a href='#'>{{ l('No facebook account available') }}</a></li>
+					{% endif %}
+		  		<input type="text" id="newCategoryName" name="newCategoryName" class="form-control" placeholder="{{ l('New category name') }}"/>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-default" data-dismiss="modal">{{ l("Close") }}</button>
+				<button id="addCategory" onclick="return false;" class="btn btn-primary">{{ l("Create") }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="{{ assets('theme/default/plugins/select2/select2.min.js') }}"></script>
+<script>
+	$(function(){
+
+
+		function formatState (state) {
+		if (!state.id) {return state.text;}
+		var $state = $(
+			'<span><img src="https://graph.facebook.com/'+state.element.value.toLowerCase()+'/picture?redirect=1&height=32&width=32&type=normal" class="img-fb-account" /> ' + state.text + '</span>'
+		);
+		return $state;
+	};
+
+	$("#facebook-accounts").select2({templateResult: formatState});
+
+
+		$('.createNewCatBtn').on('click', function(e) {
+			$("#addNewCatModal").modal("show");
+		});
+
+		$('#addNewCatModal').on('click','#addCategory', function(e) {
+			$("#addCategory").prop('disabled', true);
+			kp_preloader("on","#addNewCatModal .modal-body");
+			$.ajax({
+		      url: '{{ base_url("nodes_categories/add_category") }}',
+		      dataType: 'json',
+		      type: 'post',
+		      contentType: 'application/x-www-form-urlencoded',
+		      data: { 
+		      	categoryname: $("#newCategoryName").val(),
+		      	facebook_account: $("#facebook-accounts").val(),
+				{{ config_item('csrf_token_name') }} : getCookie("{{ config_item('csrf_cookie_name') }}"),
+		      },
+		      success: function( data, textStatus, jQxhr ){
+		      	if(data.status == "success"){
+                  if(data.message !== null && typeof data.message === 'object'){
+                    htmlData = "<ul>";
+                    Object.keys(data.message).forEach(function(key) {
+                        htmlData += "<li>" + data.message[key] + "</li>";
+                    });
+                    htmlData += "</ul>";
+                  }else{
+                    htmlData = data.message;
+                  }
+                  alertBox(htmlData,"success",".addNewCatModalMsgBox",true,true);
+									$(document).on('hide.bs.modal','#addNewCatModal', function () {location.reload();});
+                }else{
+                  if(data.message !== null && typeof data.message === 'object'){
+                    htmlData = "<ul>";
+                    Object.keys(data.message).forEach(function(key) {
+                        htmlData += "<li>" + data.message[key] + "</li>";
+                    });
+                    htmlData += "</ul>";
+                  }else{
+                    htmlData = data.message;
+                  }
+                  alertBox(htmlData,"danger",".addNewCatModalMsgBox",false,true);
+                }
+
+		        $("#addCategory").prop('disabled', false);
+		        	
+		      },
+		      error: function( jqXhr, textStatus, errorThrown ){ 
+		      	console.log(errorThrown);
+		      	alertBox("{{ l('Unable to complete your request, Please try again') }}","danger",".addNewCatModalMsgBox",false,true);
+		      	$("#addCategory").prop('disabled', false);
+		      },
+		      complete: function(){
+		      	kp_preloader("off","#addNewCatModal .modal-body");
+		      }
+		    });
+		});	
+	});	
+</script>

@@ -1,0 +1,24 @@
+{% extends "base_dashboard.twig" %}
+
+{% block title %}
+  {{ l('Error logs') }}
+{% endblock %}
+
+{% block body %}
+  {{ parent() }}
+<div class="card errorLogs">
+  <div class="card-header">System error log</div>
+  <div class="row">
+    <div class="col-md-2">
+      <ul class="nav nav-pills nav-stacked">
+        {% for l in logs %}
+          <li><a href="{{base_url("error_logs?logfile="~l)}}">{{l}}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-10">
+      <pre>{{fileContent}}</pre>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+<div class="panel panel-default">
+<div class="panel-heading">
+  <h4 class="panel-title">
+    <a data-toggle="collapse" data-parent="#accordion" href="#social_login">
+    <i class="fab fa-facebook-f fa-fw" aria-hidden="true"></i> 
+	<span>{{ l('Social login') }}</span></a>
+  </h4>
+</div>
+<div id="social_login" class="panel-collapse collapse">
+	<div class="panel-body">
+		<div class="col-md-6">
+			<div class="input-group">
+				{% set fb_login_app = input_post("fb_login_app") is not empty ? input_post("fb_login_app") : app_settings["fb_login_app"] %}
+				<label for="fb_login_app">{{ l('Facebook App ID') }}</label>
+				<input type="text" name="fb_login_app" class="form-control" id="fb_login_app" placeholder="{{ l('Facebook App ID') }}" value="{{ fb_login_app }}" />
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="input-group">
+				{% set fb_login_app_secret = input_post("fb_login_app_secret") is not empty ? input_post("fb_login_app_secret") : app_settings["fb_login_app_secret"] %}
+				<label for="fb_login_app_secret">{{ l('Facebook App secret') }}</label>
+				<input type="text" name="fb_login_app_secret" class="form-control" id="fb_login_app_secret" placeholder="{{ l('Facebook App secret') }}" value="{{ fb_login_app_secret }}" />
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="input-group">
+			<div>{{l("Your OAuth redirect uri")}} : </div>
+			<small style="color:red">{{base_url("user/thirdparty_login/facebook/")}}</small>
+			</div>
+		</div>
+		<input type="submit" name="save" value="{{ l('SAVE_CHANGES') }}" class="btn btn-primary" />		
+	</div>
+</div>
+</div>

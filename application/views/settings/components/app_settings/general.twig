@@ -1,0 +1,133 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+	  <h4 class="panel-title">
+	    <a data-toggle="collapse" data-parent="#accordion" href="#general">
+	    <i class="fa fa-cog"></i>
+	    <span>{{ l("General")}}</span></a>
+	  </h4>
+	</div>
+	<div id="general" class="panel-collapse collapse in">
+	  <div class="panel-body">
+		<div class="input-group">
+			{% set sitename = input_post("sitename") is not empty ? input_post("sitename") : app_settings["sitename"] %}
+			<label for="sitename">{{ l('SITE_NAME') }}</label>
+			<input type="text" name="sitename" class="form-control" id="sitename" placeholder="{{ l('SITE_NAME') }}" value="{{ sitename }}" />
+		</div>
+
+		<div class="input-group">
+			{% set adminEmail = input_post("adminEmail") is not empty ? input_post("adminEmail") : app_settings["admin_email"] %}
+			<label for="adminEmail">{{ l('Admin E-mail') }}</label>
+			<input type="text" name="adminEmail" class="form-control" id="adminEmail" placeholder="{{ l('Admin E-mail') }}" value="{{ adminEmail }}" />
+		</div>
+
+		{% if input_post("usersCanRegister") is not empty %}
+			{% set usersCanRegister = input_post("usersCanRegister") == 'on' ? "checked" : "" %}
+		{% else %}
+			{% set usersCanRegister = app_settings["users_can_register"] == 1 ? "checked" : "" %}
+		{% endif %}
+
+		<div class="input-group">
+			<label class="switch">
+				<input type="checkbox" class='checkbox-style' id="usersCanRegister" name="usersCanRegister" aria-label="Users can register" {{ usersCanRegister }} />
+				<span class="slider round"></span>
+			</label>
+			<label for="usersCanRegister" class="input-text">{{ l('USERS_CAN_REGISTER') }}</label>
+		</div>
+
+		<div class="input-group">
+			{% if input_post("usersMustConfirmEmail") is not empty %}
+				{% set usersMustConfirmEmail = input_post("usersMustConfirmEmail") == 'on' ? "checked" : "" %}
+			{% else %}
+				{% set usersMustConfirmEmail = app_settings["users_must_confirm_email"] == 1 ? "checked" : "" %}
+			{% endif %}
+			<label class="switch">
+				<input type="checkbox" id="usersMustConfirmEmail" name="usersMustConfirmEmail"  class='checkbox-style' aria-label="New users must confirm their email address" {{ usersMustConfirmEmail }}/>
+				<span class="slider round"></span>
+			</label>
+			<label for="usersMustConfirmEmail" class="input-text">{{ l('USERS_MUST_CONFIRM_EMAIL') }}</label>
+		</div>
+
+		<div class="input-group">
+			{% if input_post("userActiveByAdmin") is not empty %}
+				{% set userActiveByAdmin = input_post("userActiveByAdmin") == 'on' ? "checked" : "" %}
+			{% else %}
+				{% set userActiveByAdmin = app_settings["user_active_by_admin"] == 1 ? "checked" : "" %}
+			{% endif %}
+			<label class="switch">
+				<input type="checkbox" id="userActiveByAdmin" name="userActiveByAdmin"  class='checkbox-style' aria-label="{{ l('New users accounts must be activated by an admin') }}" {{ userActiveByAdmin }}/>
+				<span class="slider round"></span>
+			</label>
+			<label for="userActiveByAdmin" class="input-text">{{ l('New users accounts must be activated by an admin') }}</label>
+		</div>
+
+		<div class="input-group">
+			{% if input_post("receiveNotifNewUser") is not empty %}
+				{% set receiveNotifNewUser = input_post("receiveNotifNewUser") == 'on' ? "checked" : "" %}
+			{% else %}
+				{% set receiveNotifNewUser = app_settings["receive_notif_new_user"] == 1 ? "checked" : "" %}
+			{% endif %}
+			<label class="switch">
+				<input type="checkbox" id="receiveNotifNewUser" name="receiveNotifNewUser"  class='checkbox-style' aria-label="{{ l('Get email notification upon user registration') }}" {{ receiveNotifNewUser }}/>
+				<span class="slider round"></span>
+			</label>
+			<label for="receiveNotifNewUser" class="input-text">{{ l('Get email notification upon user registration') }}</label>
+		</div>
+
+		<div class="input-group">
+			<label for="defaultRole">{{ l('New users Default role') }}</label>
+			<select name="default_role" id="defaultRole" class="form-control">
+				{% for role in roles %}
+					{% set listRoles = json_decode(role.permissions) %}
+					{% if listRoles.admin is empty %}
+						<option value="{{ role.id }}" {% if role.id == app_settings['default_role'] %}selected{% endif %}>{{ l(role.name) }}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+		</div>
+
+		<div class="input-group">
+			<label for="default_timezone">{{ l('New users Default timezone') }}</label>
+			<select name="default_timezone" id="default_timezone" class="form-control">
+				{% for timezone in timezones %}
+					<option value="{{ timezone }}" {% if timezone == app_settings['default_timezone'] %}selected{% endif %}>{{ timezone }}</option>
+				{% endfor %}
+			</select>
+		</div>
+
+		<div class="input-group">
+			<label for="default_lang">{{ l('Default language') }} <small><i class="fa fa-plus"></i> <a href="{{ help_link("add_lang") }}" target="_blank">Add language</a></small></label>
+			<select name="default_lang" id="default_lang" class="form-control">
+				{% for lang in lang.availableLanguages %}
+					<option value="{{ lang }}" {% if lang == app_settings['default_lang'] %}selected{% endif %}>{{ lang|capitalize }}</option>
+				{% endfor %}
+			</select>
+		</div>
+
+		<div class="input-group">
+			{% set date_format = app_settings["date_format"] %}
+			<label for="date_format">{{ l('Date format') }}</label>
+			<select name="date_format" id="date_format" class="form-control">
+				<option value="1" {% if date_format == "m/d/Y" %}selected{% endif %}>MM/DD/YYYY</option>
+				<option value="2" {% if date_format == "d/m/Y" %}selected{% endif %}>DD/MM/YYYY</option>
+				<option value="3" {% if date_format == "Y/d/m" %}selected{% endif %}>YYYY/DD/MM</option>
+				<option value="4" {% if date_format == "Y/m/d" %}selected{% endif %}>YYYY/MM/DD</option>
+			</select>
+		</div>
+
+		<div class="input-group">
+			{% if input_post("disable_dt_plugin") is not empty %}
+				{% set disable_dt_plugin = input_post("disable_dt_plugin") == 'on' ? "checked" : "" %}
+			{% else %}
+				{% set disable_dt_plugin = app_settings["disable_dt_plugin"] == 1 ? "checked" : "" %}
+			{% endif %}
+			<label class="switch">
+				<input type="checkbox" id="disable_dt_plugin" name="disable_dt_plugin"  class='checkbox-style' aria-label="{{ l('Lite mode for nodes table') }}" {{ disable_dt_plugin }}/>
+				<span class="slider round"></span>
+			</label>
+			<label for="disable_dt_plugin" class="input-text">{{ l('Enable Lite mode for nodes table') }} <a href="#"  onclick="return false;" data-toggle="kp_tooltip" title="{{ l("This option allows you to switch to lite mode for displaying groups and pages, if the home page takes long time to load it's recommended to enable this option") }}"><i class="fa fa-question-circle" aria-hidden="true"></i></a></label>
+		</div>
+		
+		<input type="submit" name="save" value="{{ l('SAVE_CHANGES') }}" class="btn btn-primary" />
+	  </div>
+	</div>
+</div>

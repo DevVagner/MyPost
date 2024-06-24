@@ -1,0 +1,5 @@
+{% if app_settings.ads_code is not empty and user.currentuser().role in showAdsTo %}
+  <div class="adsContainer">
+    {{ app_settings.ads_code|raw }}
+  </div>
+{% endif %}

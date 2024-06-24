@@ -1,0 +1,56 @@
+<div class="panel panel-default">
+<div class="panel-heading">
+  <h4 class="panel-title">
+    <a data-toggle="collapse" data-parent="#accordion" href="#ads_settings">
+    <i class="fa fa-bullhorn fa-fw" aria-hidden="true"></i> 
+	<span>{{ l('Ads Settings') }}</span></a>
+  </h4>
+</div>
+<div id="ads_settings" class="panel-collapse collapse">
+	<div class="panel-body">
+		<div class="input-group">
+			<label for="ads_code">{{ l('Ads banner') }} <small>( {{ l("Responsive ADS code") }} )</small></label>
+			<textarea name="ads_code" class="form-control" id="ads_code" placeholder="{{ l('Responsive ADS code') }}" >{{ unescape(app_settings["ads_code"])|raw }}</textarea> 
+		</div>
+
+		{% if input_post("ads_code_public_p") is not empty %}
+			{% set ads_code_public_p = input_post("ads_code_public_p") == 'on' ? "checked" : "" %}
+		{% else %}
+			{% set ads_code_public_p = app_settings["ads_code_public_p"] == 1 ? "checked" : "" %}
+		{% endif %}
+
+		<div class="input-group">
+			<label class="switch">
+				<input type="checkbox" class='checkbox-style' id="ads_code_public_p" name="ads_code_public_p" aria-label="{{ l('Display Ads on public pages') }}" {{ ads_code_public_p }} />
+				<span class="slider round"></span>
+			</label>
+			<label for="ads_code_public_p" class="input-text">{{ l('Display Ads on public pages') }}</label>
+		</div>
+
+		<div class="card-deck">
+			<div class="card">
+				<div class="card-header">
+					{{l("Show ADS to")}}
+				</div>
+				<div class="card-block">
+					<div class="row">
+						{% for role in roles %}
+							<div class="col-md-4">
+								<div class="input-group">
+									<label class="switch">
+										<input type="checkbox" class='checkbox-style' id="role_{{role.id}}" name="showAdsTo[]" value="{{role.id}}" aria-label="{{role.name|capitalize}}" {% if role.id in showAdsTo %}checked{% endif %} />
+										<span class="slider round"></span>
+									</label>
+									<label for="role_{{role.id}}" class="input-text">{{role.name|capitalize}}</label>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<input type="submit" name="save" value="{{ l('SAVE_CHANGES') }}" class="btn btn-primary" />		
+	</div>
+</div>
+</div>

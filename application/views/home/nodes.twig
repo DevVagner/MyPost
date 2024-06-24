@@ -1,0 +1,71 @@
+{% set privacy = {"OPEN":'eye', 'CLOSED': 'eye-slash', 'SECRET': 'archive'} %}
+
+		{% for node in userFbNodes %}
+			{% set nodeId = node.id %}
+			{% set nodeName = node.name %}
+			{% set page_likes = "" %}
+
+			{% if node.privacy is not empty %}
+				{% set nodeType = 'Group' %}
+			{% else %}
+				{% set nodeType = 'Page' %}
+				{% if node.likes %}
+					{% set page_likes = node.likes|number_format %}
+				{% endif %}
+			 {% endif %}
+
+			{% set nodePrivacy = node.privacy ? node.privacy : '' %}
+
+			{% if input_post('selectGroup')[i] %}
+				{% set checked = "checked='checked'" %}
+			{% endif %}
+			
+			<tr class='groupName {{ nodeType }}Type' id='{{ nodeId }}'>
+
+				<td>
+					<input type='checkbox' class='fbnode checkbox checkbox-style' name='selectGroup[{{ loop.index }}]' id='selectgroup_{{ node.id }}' value='{{ nodeId }}' {{ checked }}>
+					<label for='selectgroup_{{ nodeId }}'></label>
+				</td>
+
+				<td class='groupTitle' id='group_{{ nodeId }}'>
+					<input type='hidden' name='selectGroupName[{{loop.index }}]' value='{{ nodeName }}' />
+					<span {% if less_data == FALSE %}title="{{ nodeName }}"{% endif %}>{{ nodeName[0:60] }}{% if nodeName|length > 60 %}...{% endif %}
+
+					<a href='https://fb.com/{{ nodeId }}' target='_blank'>
+					<i class="fa fa-external-link"></i></a></span>
+
+					{% if user_options['show_hidden_nodes'] == 1 %}
+						{% if nodeType == "Group" %}
+							{% set hiddenNodesIDs = json_decode(hiddenNodes.row('hidden_groups'),TRUE) %}
+						{% else %}
+							{% set hiddenNodesIDs = json_decode(hiddenNodes.row('hidden_pages'),TRUE) %}
+						{% endif %}
+
+						<span class="HiddenNodeBadge">
+						{% if nodeId in hiddenNodesIDs %}
+						<span class="badge badge-danger">{{ l('hidden') }}</span>
+						{% endif %}
+						</span>
+					{% endif %}
+
+				</td>
+
+				<td class="nodeType">{{ l(nodeType) }}</td>
+				<td class="count">{{ node.members.summary.total_count }}{{ page_likes }}</td>
+
+				<td class="privacyAndLikes">
+					{% if node.privacy is not empty %}
+						<i class="fa fa-{{ privacy[nodePrivacy] }}"></i>
+						&nbsp;<span class="hidden-xs">{{ l(nodePrivacy) }}</span>
+						<input type='hidden' name='selectGroupPrivacy[{{ loop.index }}]' value='{{ nodePrivacy }}'>
+					{% else %}
+						-
+					{% endif %}
+				</td>
+
+				<td>
+					<span class='postStatus_{{ nodeId }} postStatus'></span>
+				</td>
+			</tr>
+		{% else %}
+		{% endfor %}

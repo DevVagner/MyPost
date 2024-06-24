@@ -1,0 +1,95 @@
+
+<div class="row">
+<div class="col-xs-12">
+<div class="panel panel-default">
+	<div class="panel-body groupsOptions">
+
+			<div class="row">
+				<div class="col-xs-12 col-sm-6 col-md-4">
+				{{ l('Groups') }} : <strong class="groupsCount">{{ fbaccount.getGroupsCount() }}</strong> | {{ l('Pages') }} : <strong class="pagesCount">{{ fbaccount.getPagesCount() }}</strong> | {{ l('Managed Pages') }} : <strong class="managedPagesCount">{{ fbaccount.getManagedPagesCount() }}</strong> 
+				</div>
+
+
+				<div class="col-xs-12 col-sm-6 col-md-4">
+				<div class="form-group">
+				<span id="countSelectedNodes" class="badge badge-primay" style="display: none" /><i class="fa fa-check fa-fw" aria-hidden="true"></i> <span
+				 class="groups">0</span> {{ l('Groups') }}, <span class="pages">0</span> {{
+				l('Pages') }}, {{l('Total')}} : <span class="total">0</span>
+				</span>
+			</div>
+				</div>
+
+				<div class="col-xs-12 col-sm-6 col-md-4">
+						<div class="btn-group pull-right">
+					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+					aria-expanded="false">
+						Action <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-right">
+						<li>
+							<a id="addSelectedNodes" data-toggle="kp_tooltip" data-placement="top" title="{{ l('Add selected nodes to a category') }}" />
+							<span class="visible-lg">
+								<i class="fa fa-fw fa-plus"></i> {{ l('Add node') }}
+							</span>
+							<span class="hidden-lg"><i class="fa fa-fw fa-plus"></i></span>
+							</a>
+						</li>
+						{% if fbaccountDetails.row() and fbaccountDetails.row('default_nodes_category') > 0 %}
+						<li>
+							<a id="deleteSelectedNodes" data-toggle="kp_tooltip" data-placement="top" title="{{ l('Remove selected nodes') }}" />
+							<span class="visible-lg"><i class="fa fa-fw fa-trash"></i> {{ l('Remove node') }}</span>
+							<span class="hidden-lg"><i class="fa fa-fw fa-trash"></i></span>
+							</a>
+						</li>
+						{% endif %}
+
+						<li>
+							<a id="unHideSelectedNodes" data-toggle="kp_tooltip" data-placement="top" title="{{ l('unHide selected nodes') }}" />
+							<span class="visible-lg"><i class="fa fa-fw fa-eye"></i> {{ l('unHide node') }}</span>
+							<span class="hidden-lg"><i class="fa fa-fw fa-eye"></i></span>
+							</a>
+						</li>
+
+						<li>
+							<a id="hideSelectedNodes" data-toggle="kp_tooltip" data-placement="top" title="{{ l('Hide selected nodes') }}" />
+							<span class="visible-lg"><i class="fa fa-fw fa-eye-slash"></i> {{ l('Hide node') }}</span>
+							<span class="hidden-lg"><i class="fa fa-fw fa-eye-slash"></i></span>
+							</a>
+						</li>
+
+						<li>
+							<a id="exportGroupsCSV" data-toggle="kp_tooltip" data-placement="top" title="{{ l('Export current groups IDs') }}" />
+							<span class="visible-lg"><i class="fa fa-fw fa-cloud-download-alt"></i> {{ l('Export
+								Groups to CSV') }}</span>
+							<span class="hidden-lg"><i class="fa fa-fw fa-cloud-download-alt"></i></span>
+
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="form-group pull-right mr-3">
+				<div class="input-group">
+					{% if input_get('post_id') %}
+					{{ form_open("?post_id="~input_get('post_id')) }}
+					{% else %}
+					{{ form_open() }}
+					{% endif %}
+					<select id="nodescategory" name="nodescategory" class="form-control" onchange="this.form.submit()">
+						<option value="-1">-- {{ l('All') }} --</option>
+						{% for gc in nodesCategories %}
+						{% if fbaccountDetails.row('default_nodes_category') == gc.id %}
+						<option value="{{ gc.id }}" selected>{{ gc.category_name }}</option>
+						{% else %}
+						<option value="{{ gc.id }}">{{ gc.category_name }}</option>
+						{% endif %}
+						{% endfor %}
+					</select>
+					</form>
+				</div>
+			</div>
+				</div>
+			</div>
+	</div>
+</div>
+</div>
+</div>

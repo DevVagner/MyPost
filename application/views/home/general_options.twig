@@ -1,0 +1,51 @@
+<aside class="control-sidebar control-sidebar-dark">
+    <div class="tab-content">
+      <div class="tab-pane active" id="control-sidebar-home-tab">
+        <h3 class="control-sidebar-heading">{{l("Nodes options")}}</h3>
+        <ul class="control-sidebar-menu">
+          <li>
+            <div class="form-group">
+						<label class="switch">
+							<input type="checkbox" id="toggleHiddenNodes" name="toggleHiddenNodes" aria-label="{{l('Show Hidden nodes')}}"
+							 {% if user_options['show_hidden_nodes']==1 %}checked {% endif %} />
+							<span class="slider round"></span>
+						</label>
+						<label for="toggleHiddenNodes" class="input-text">{{ l('Show Hidden nodes') }}</label>
+            </div>
+          </li>
+
+          <li>
+            <div class="form-group groupVtoggle">
+              <label class="switch">
+                <input type="checkbox" id="showGroups" name="showGroups" aria-label="Unique post" {% if
+                  user_options['show_groups']==1 %}checked {% endif %} />
+                <span class="slider round"></span>
+              </label>
+              <label for="showGroups" class="input-text">{{ l('Show Groups') }}</label>
+            </div>
+          </li>
+
+          <li>
+            <div class="form-group">
+            <label class="switch">
+              <input type="checkbox" id="showPages" name="showPages" aria-label="{{l('Pages')}}" {% if
+                user_options['show_pages']==1 %}checked {% endif %} />
+              <span class="slider round"></span>
+            </label>
+            <label for="showPages" class="input-text">{{ l('Show pages') }}</label>
+            </div>
+          </li>
+
+          <li>
+            <div class="form-group">
+              <label class="switch">
+              <input type="checkbox" id="showManagedPages" name="showManagedPages" aria-label="{{l('Managed pages')}}" {% if user_options['show_managed_pages']==1 %}checked {% endif %} />
+              <span class="slider round"></span>
+            </label>
+            <label for="showManagedPages" class="input-text">{{l('Managed pages')}}</label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>

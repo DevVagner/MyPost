@@ -1,0 +1,40 @@
+<div id="updateFbAccount" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">{{ l('Update Facebook account') }}</h4>
+      </div>
+      <div class="modal-body">
+        <div class='updateFbAccountalerts alertBox'>
+        	<div class="alert alert-info">
+	        	{{ l('Updating your facebook account') }}...
+	        </div>
+        </div>
+
+        {{ form_open_multipart() }}
+	        <input type="hidden" name="fbaccount_id" id="fbAccountId" value="0">
+
+	        <div class="updatefbAccountSection" style="display:none">
+	        	{% set compp_ = "update" %}
+		        {% include "settings/components/add_fb_account.twig" %}
+			</div>
+
+			<div class="row importGroups" style="display:none;">
+				<div class="col-md-12">
+					<p style="text-align:center; margin-top: 10px">{{ l('Or') }}</p>
+					<label for="htmlpage">{{ l('Import groups via html page') }} (<small>Save the html page from <a href="https://mbasic.facebook.com/groups/?seemore" target="_blank">https://mbasic.facebook.com/groups/?seemore</a></small>)</label>
+					<input type="file" name="htmlpage" id="htmlpage" />
+					<input type="submit" class="btn btn-primary uploadGroupsFile" value="{{ l("Upload Your html file") }}" />
+				</div>
+	        </div>
+	    </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{{ l("Close") }}</button>
+      	<input type='button' class='btn btn-primary' id="addFbAccountBtn" value='{{ l("Update facebook account") }}'>
+      </div>
+    </div>
+  </div>
+</div>

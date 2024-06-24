@@ -1,0 +1,386 @@
+{% extends "base_dashboard.twig" %}
+
+{% set at_parse = true %}
+{% set at_source = "" %}
+
+{% block title %}
+	{{ l('Facebook accounts') }}
+{% endblock %}
+
+{% set controlSidebar = true %}
+
+{% block body %}
+	{{ parent() }}
+
+	{% include "facebook_accounts/components/sidebar_options.twig" %}
+	<section class="content-header">
+		<h4><i class="fab fa-facebook"></i> {{ l('Facebook Accounts') }}</h4>
+	</section>
+
+<section class="content">
+	<div class="row">
+
+	{% set listFbAccounts = fbaccount.getAll() %}
+	
+	{% if listFbAccounts is not empty %}
+	<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+		<div class="card">
+			<a href="#" data-toggle="modal" data-target="#addNewFbAccount"><span class="addFbAccountPlaceHolder"><i class="fa fa-plus-circle" aria-hidden="true"></i></span></a>
+				<div class="card-block">
+					<h4 class="card-title"><a href="#" data-toggle="modal" data-target="#addNewFbAccount">Add account</a></h4>
+				</div>
+		</div>
+  </div>
+	{% else %}
+		<div class="no-accounts-available"
+			<button data-toggle="modal" data-target="#addNewFbAccount" data-toggle="tooltip" title="{{l("Add Facebook account")}}">
+				<span class="addFbAccountPlaceHolder noaccounts">
+				<i class="fa fa-plus-circle" aria-hidden="true"></i></span>
+			</button>
+			<span>{{l("No Facebook account available")}}</span>
+			</div>
+	{% endif %}
+
+	{% for fba in fbaccount.getAll() %}
+	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+      <div class="box box-widget widget-user-2 smAccountBox">
+        <div class="widget-user-header bg-gray-light" style="background-image:url(https://graph.facebook.com/{{ fba.fb_id }}/picture?redirect=1&height=150&width=150&type=normal);">
+          <div class="widget-user-image">
+            <img class="img-circle" src="https://graph.facebook.com/{{ fba.fb_id }}/picture?redirect=1&height=150&width=150&type=normal" onerror="this.src = '{{ assets('theme/default/images/user-default.png') }}'" alt="{{fba.name|capitalize}}">
+			</div>
+
+			{% if fbaccount.UserDefaultFbAccount() == fba.fb_id %}
+				<span class='badge badge-default currentFbAccount'>{{l('Default')}}</span>
+			{% endif %}
+		  
+			<ul class="accountOptions">
+		  	<li>
+			  <button type='button' value='{{ fba.fb_id }}' title='{{ l('Delete') }}' class='btn btn-danger deleteFbAccountBtn'><i class="far fa-trash-alt" aria-hidden="true"></i></button>
+			</li>
+			<li>
+				<button type='button' value='{{ fba.fb_id }}' title='{{ l('Update') }}' class='btn btn-primary updateFbAccount'><i class="fas fa-sync-alt" aria-hidden="true"></i></button>
+			</li>
+			<li>
+				<button type='button' value='{{ fba.fb_id }}' title='{{ l('Edit account') }}' class='btn btn-default editFbAccount'><i class="fas fa-pencil-alt" aria-hidden="true"></i></button>
+			</li>
+		  </ul>
+          
+          <h3 class="widget-user-username"><strong>{{fba.name|capitalize}}</strong></h3>
+
+        </div>
+        <div class="box-footer no-padding">
+          <ul class="nav nav-stacked">
+            <li><a href="#">{{l("Groups")}} <span class="pull-right font-weight-bold">{{fba.groups_count}}</span></a></li>
+            <li><a href="#">{{l("Pages")}} <span class="pull-right font-weight-bold">{{fba.pages_count}}</span></a></li>
+            <li><a href="#">{{l("Managed pages")}} <span class="pull-right font-weight-bold">{{fba.managed_pages_count}}</span></a></li>
+            <li><a href="#">{{l("Friends")}} <span class="pull-right font-weight-bold">{{fba.friends_count}}</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+	{% endfor %}
+	</div>
+	</div>
+</form>
+
+<!-- New facebook account modal -->
+{% include "facebook_accounts/components/add_account.twig" %}
+<!-- Update facebook account modal -->
+{% include "facebook_accounts/components/update_account.twig" %}
+{% include "settings/components/edit_fb_account.twig" %}
+
+{# Box variables #}
+{% set box_id = "fb_account" %}
+{% set delete_msg = l("Are you sure you want to delete the selected account?") %}
+{% include "blocks/delete_modal.twig" %}
+
+{% endblock %}
+
+{% block javascripts_footer %}
+
+	{{ parent() }}
+
+	<script src="{{ assets('theme/default/js/helpers.js') }}"></script>
+	<script>
+		$(function(){
+
+			$( ".appToggleBtn" ).click(function() {
+			  $( ".appToggle" ).toggle();
+			});
+
+			$('#addNewFbAccount #accessTokenURL').bind('input propertychange', function() {
+				var at = $(this).val().match(/access_token=(.*)(?=&expires_in)/);
+				if(at){$("#addNewFbAccount #accessToken").val(at[1]);}
+			});
+			
+			$('#addNewFbAccount #accessTokenURL').bind('input propertychange', function() {
+				var at = $(this).val().match(/"access_token":"(.*)(?=","machine_id)/);
+				if(at){$("#addNewFbAccount #accessToken").val(at[1]);}
+			});
+
+			$('#updateFbAccount #accessTokenURL').bind('input propertychange', function() {
+				var at = $(this).val().match(/access_token=(.*)(?=&expires_in)/);
+				if(at){$("#updateFbAccount #accessToken").val(at[1]);}
+			});
+			
+			$('#updateFbAccount #accessTokenURL').bind('input propertychange', function() {
+				var at = $(this).val().match(/"access_token":"(.*)(?=","machine_id)/);
+				if(at){$("#updateFbAccount #accessToken").val(at[1]);}
+			});
+			
+			$( "#addNewFbAccount #addFbAccountBtn" ).click(function(){
+				addFbAccount("#addNewFbAccount");
+			});
+
+			$( "#updateFbAccount #addFbAccountBtn" ).click(function(){
+				addFbAccount("#updateFbAccount");
+			});
+
+
+			$("#updateFbAccount .fb_login").click(function(){
+				login_via_pw("#updateFbAccount",$( this ).val());
+			});
+
+			$("#addNewFbAccount .fb_login").click(function(){
+				login_via_pw("#addNewFbAccount",$( this ).val());
+			});
+
+			{# Delete action #}
+		    $(".deleteFbAccountBtn").click(function(){
+				$("#delete_fb_account").modal("show");
+				deleteFbAccountBtn = $(this);
+		    });
+
+		    $(".deleteBtn_fb_account" ).click(function(){
+		    	kp_preloader("on","#delete_fb_account .modal-body");
+			    $.ajax({
+			      url: '{{ base_url("facebook_accounts/home/delete") }}',
+			      dataType: 'json',
+			      type: 'post',
+			      contentType: 'application/x-www-form-urlencoded',
+			      data: { 
+			      	id: deleteFbAccountBtn.val(),
+			      	{{ config_item('csrf_token_name') }}: getCookie('{{ config_item('csrf_cookie_name') }}') 
+			      },
+			      success: function( data, textStatus, jQxhr ){
+			        if(data.status == "success"){
+			        	alertBox(data.message,"success",".deleteAlertBox_fb_account",false,false);
+		            	$(".deleteBtn_fb_account").prop('disabled', true);
+			        	$(document).on('hide.bs.modal','#delete_fb_account', function () {
+			        		location.reload();
+			        	});
+			        }else{
+			        	alertBox(data.message,"danger",".deleteAlertBox_fb_account",false,false);
+			        }
+			      },
+			      error: function( jqXhr, textStatus, errorThrown ){ 
+			      	console.log(errorThrown);
+			      	alertBox("{{ l('Unable to complete your request') }}","danger",".deleteAlertBox_fb_account",false,false);
+			      },
+			      complete: function() {
+			      	kp_preloader("off","#delete_fb_account .modal-body");
+			      }
+			    });
+
+			    $('.deleteBox_content_fb_account').html("");
+		      
+    		});
+
+    		var xhr = null;
+		    $(".updateFbAccount").click(function() {
+		    	kp_preloader("on","#updateFbAccount .modal-body");
+		    	//$(".updateFbAccountalerts").html("");
+		    	alertBox("{{ l('Updating your facebook account') }}...","info",".updateFbAccountalerts",false,false);
+		    	$("#updateFbAccount").modal("show");
+		    	$('.updatefbAccountSection').hide();
+					$('.importGroups').hide();
+		    	$("#fbAccountId").val($(this).val());
+		    	if(xhr!==null) xhr.abort();
+		    	xhr = $.ajax({
+					url: '{{ base_url("facebook_accounts/home/update") }}',
+					dataType: 'json',
+					type: 'post',
+					contentType: 'application/x-www-form-urlencoded',
+					data: { 
+						fbaccount_id: $("#fbAccountId").val(),
+ 						{{ config_item('csrf_token_name') }}: getCookie('{{ config_item('csrf_cookie_name') }}') 
+ 					},
+					success: function( data, textStatus, jQxhr ){
+						if(data.status == "success"){
+							alertBox(data.message,"success",".updateFbAccountalerts",false,false);
+						  	$(".deleteBtn_post").prop('disabled', true);
+							$(document).on('hide.bs.modal','#updateFbAccount', function () {location.reload();});
+							$("#updateFbAccount #addFbAccountBtn").hide();
+						}else if(data.status == "warning"){
+							alertBox(data.message,"warning",".updateFbAccountalerts",false,false);
+							$('.updatefbAccountSection').show();
+							$('.importGroups').show();
+						}else{
+							htmlData = "";
+		                	if(data.message !== null && typeof data.message === 'object'){
+								Object.keys(data.message).forEach(function(key) {
+								    htmlData += data.message[key]+" ";
+								});
+		                	}else{
+		                		htmlData = data.message;
+		                	}
+							alertBox(htmlData,"danger",".updateFbAccountalerts",false,false);
+							$('.updatefbAccountSection').show();
+							$('.importGroups').show();
+						}
+					},
+					error: function( jqXhr, textStatus, errorThrown ){ 
+					  console.log(errorThrown);
+					  alertBox("{{ l('Unable to complete your request') }}","danger",".updateFbAccountalerts",false,false);
+					},
+			        complete: function() {
+			          kp_preloader("off","#updateFbAccount .modal-body");
+			        }
+				});
+		    });
+
+		    $(".uploadGroupsFile").on('click',(function(e) {
+				e.preventDefault();
+				kp_preloader("on","#updateFbAccount .modal-body");
+
+				htmlFileFormData = new FormData();
+
+				htmlFileFormData.set('htmlpage', $("#htmlpage")[0].files[0]);
+				htmlFileFormData.append('fbaccount_id', $("#fbAccountId").val());
+				htmlFileFormData.append('{{ config_item('csrf_token_name') }}', getCookie('{{ config_item('csrf_cookie_name') }}')); 
+
+				$.ajax({
+					url: "{{ base_url('facebook_accounts/import_groups') }}",
+					type: "POST",
+					data: htmlFileFormData,
+					contentType: false,
+					cache: false,
+					processData:false,
+					success: function( data, textStatus, jQxhr ){
+						if(data.status == "success"){
+							alertBox(data.message,"success",".updateFbAccountalerts",false,false);
+						  	$(".deleteBtn_post").prop('disabled', true);
+							$(document).on('hide.bs.modal','#updateFbAccount', function () {location.reload();});
+						}else{
+							htmlData = "";
+		                	if(data.message !== null && typeof data.message === 'object'){
+								Object.keys(data.message).forEach(function(key) {
+								    htmlData += data.message[key]+" ";
+								});
+		                	}else{
+		                		htmlData = data.message;
+		                	}
+							alertBox(htmlData,"danger",".updateFbAccountalerts",false,false);
+						}
+					},
+					error: function( jqXhr, textStatus, errorThrown ){ 
+					  console.log(errorThrown);
+					  alertBox("{{ l('Unable to complete your request') }}","danger",".updateFbAccountalerts",false,false);
+					},
+			        complete: function() {
+			          kp_preloader("off","#updateFbAccount .modal-body");
+			        }
+				});
+			}));
+
+		});
+
+		function addFbAccount(model){
+
+			if($(model+" #accessToken").val() == ""){
+				alertBox("{{ l('Please enter the access token') }}","danger",model+" .alertBox",false);
+				return;
+			}
+
+			var reload = false;
+			$(model+" .alertBox").html('');
+			kp_preloader("on",model+" .modal-body");
+
+			alertBoxElem = $(model+" .alertBox");
+
+			$(model+" #addFbAccountBtn").prop('disabled', true);
+
+			$.ajax({
+				url: '{{ base_url("facebook_accounts/home/add") }}',
+				dataType: 'json',
+				type: 'post',
+				contentType: 'application/x-www-form-urlencoded',
+				data: { 
+					fb_accesstoken: $(model+" #accessToken").val(),
+					fb_account: $(model+" #fbAccountId").val(),
+						{{ config_item('csrf_token_name') }}: getCookie('{{ config_item('csrf_cookie_name') }}') 
+					},
+				success: function( data, textStatus, jQxhr ){
+					if(data.status == "success"){
+						alertBox(data.message,"success",alertBoxElem,false,false);
+					  	$(model+' .updatefbAccountSection').hide();
+						$(model+' .importGroups').hide();
+						$(document).on('hide.bs.modal',model, function () {location.reload();});
+					}else{
+						htmlData = "";
+	                	if(data.message !== null && typeof data.message === 'object'){
+							Object.keys(data.message).forEach(function(key) {
+							    htmlData += data.message[key]+" ";
+							});
+	                	}else{
+	                		htmlData = data.message;
+	                	}
+						alertBox(htmlData,"danger",alertBoxElem,false,false);
+					}
+				},
+				error: function( jqXhr, textStatus, errorThrown ){ 
+				  console.log(errorThrown);
+				  alertBox("{{ l('Unable to complete your request') }}","danger",alertBoxElem,false,false);
+				},
+		        complete: function() {
+		          // Re-enable send btn
+		          $(model+" #addFbAccountBtn").prop('disabled', false);
+		          kp_preloader("off",model+" .modal-body");
+		        }
+			});
+		}
+
+
+		function login_via_pw(model,app){
+			$(model+' .alertBox').html("");
+			$(model+" .fb_login").prop('disabled', true);
+			kp_preloader("on",model+" .modal-body");
+			$.ajax({
+				url: '{{ base_url("facebook/generate_token") }}/'+app,
+				dataType: 'json',
+				type: 'post',
+				contentType: 'application/x-www-form-urlencoded',
+				data: {
+					username: $(model+' #fb_username').val(), 
+					password: $(model+' #fb_password').val(),
+					{{ config_item('csrf_token_name') }}: getCookie('{{ config_item('csrf_cookie_name') }}') 
+				},
+				success: function( data, textStatus, jQxhr ){
+				  if(data.status == "ok"){
+				    $(model+" .token_result").html("<iframe width='100%' height='100' src='"+data.fb_url+"'></iframe>");
+				  }else{
+				  	if(data.message !== null && typeof data.message === 'object'){ 
+	                	htmlData = "<ul>";
+	                    Object.keys(data.message).forEach(function(key) {
+	                      htmlData += "<li>" + data.message[key] + "</li>";
+	                      });
+	                    htmlData += "</ul>";
+	               	}else{
+	                    htmlData = data.message;
+	            	}
+				    alertBox(htmlData,'danger',model+' .alertBox',false,true);
+				  }
+				},
+				error: function( jqXhr, textStatus, errorThrown ){ 
+				  console.log(errorThrown);
+				  alertBox('{{ l("Failed to generate Facebook token, try again") }}','danger',model+' .alertBox',true);
+				},
+		        complete: function() {
+		          $(model+" .fb_login").prop('disabled', false);
+		          kp_preloader("off",model+" .modal-body");
+		        }
+			});
+		}
+
+	</script>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "base_dashboard.twig" %}
+
+{% block title %}{{ l('Manage categories') }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>.modal .select2-container {width: 100% !important;}</style>
+<link href="{{ assets('theme/default/plugins/select2/select2.min.css') }}" rel="stylesheet"> 
+{% endblock %}
+
+{% block body %}
+	{{ parent() }}
+	<section class="content-header">
+		<h4><i class="fas fa-layer-group"></i> {{ l('Manage categories') }}</h4>
+		<button class="btn btn-primary createNewCatBtn" type="button" id="addNewBtn"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> {{ l('New') }}</button>
+		<span class="TotalRecords">{{ l('Total categories') }} : {{total_records}}</span>
+	</section>
+
+<section class="content">
+{% include "blocks/flash_bag.twig" %}
+<div class="row">
+{% for category in nodes_categories %}
+ <div class="col-md-3 col-sm-6 col-xs-12 item-{{category.id}}">
+	<div class="box box-widget widget-user-2 instgramAccountBox">
+	<div class="widget-user-header bg-gray-light" style="background-image:url(https://graph.facebook.com/{{ category.fb_id }}/picture?redirect=1&height=256&width=256&type=normal);background-size: 100%;background-position: center;-webkit-box-shadow: inset 0px 2px 66px -15px rgba(0,0,0,0.44);-moz-box-shadow: inset 0px -153px 178px -36px rgba(0,0,0,0.44);box-shadow: inset 0px -80px 150px 0px #ffffff;">
+		<div class="widget-user-image">
+		</div>
+		<button type="button" value="{{category.id}}" title="{{l('Delete')}}" class="btn btn-danger deleteNodeCategoryBtn"><i class="far fa-trash-alt" aria-hidden="true"></i></button>
+		<button type="button" value="{{category.id}}" data-fbid="{{category.fb_id}}"  title="{{l('Update')}}" class="btn btn-default updateNodeCategory"><i class="fas fa-sync" aria-hidden="true"></i></button>
+		<h3 class="widget-user-username"><b>{{ category.category_name|capitalize }}</b></h3>
+	</div>
+	<div class="box-footer no-padding">
+		<ul class="nav nav-stacked">
+		<li><a href="#">{{l("Groups")}} : {{ category.total_groups }}</a></li>
+		<li><a href="#">{{l("Pages")}} : {{ category.total_pages }}</a></li>
+		<li><a href="#">{{l("Managed pages")}} : {{ category.total_managed_pages }}</a></li>
+		</ul>
+	</div>
+	</div>
+</div>
+{% endfor %}
+</div>
+</div>
+
+{% include "nodes_categories/create_category.twig" %}
+
+{# Box variables #}
+{% set box_id = "cateogry" %}
+{% set delete_msg = l("Are you sure you want to delete this category") %}
+{% include "blocks/delete_modal.twig" %}
+
+{% endblock %}
+
+{% block javascripts_footer %}
+    {{ parent() }}
+   	<script src="{{ assets('theme/default/js/helpers.js') }}"></script>
+    <script>
+	var itemToDelete = null;	
+    {# Delete action #}
+    $(".deleteNodeCategoryBtn").click(function(){
+		itemToDelete = $(this).val();
+    	$("#delete_cateogry").modal("show");
+    });
+
+	$(".deleteBtn_cateogry" ).click(function(){
+  		var categories = [];
+  		$('.categories .checkbox:checked').each(function(){
+    		categories.push($(this).val());
+  		});
+
+  		kp_preloader("on","#delete_category .modal-body");
+		$(".deleteBtn_cateogry").prop('disabled', true);
+
+		$.ajax({
+			url: '{{ base_url("nodes_categories/delete") }}',
+			dataType: 'json',
+			type: 'post',
+			contentType: 'application/x-www-form-urlencoded',
+			data: { id: itemToDelete, {{ config_item('csrf_token_name') }}: getCookie('{{ config_item('csrf_cookie_name') }}') },
+			success: function( data, textStatus, jQxhr ){
+			  if(data.status == "success"){
+			    alertBox(data.message,"success",".deleteAlertBox_cateogry",false,false);
+			    $(".deleteBtn_cateogry").prop('disabled', true);
+				$(".item-"+itemToDelete).remove();
+			  }else{
+			    alertBox(data.message,"danger",".deleteAlertBox_cateogry",false,false);
+			  }
+			},
+			error: function( jqXhr, textStatus, errorThrown ){ 
+			  console.log(errorThrown);
+			  alertBox("{{ l('Unable to complete your request') }}","danger",".deleteAlertBox_cateogry",false,false);
+			},
+			complete: function(){
+				kp_preloader("off","#delete_category .modal-body");
+				$(".deleteBtn_cateogry").prop('disabled', false);
+			}
+		});
+
+		$('.deleteBox_content_post').html("");
+   	});
+
+	   $('.updateNodeCategory').on('click', function (e) {
+				e.preventDefault();
+				$("#refreshCategory").prop('disabled', true);
+				var fbaccount = $(this).data("fbaccount");
+				var category = $(this).val();
+				kp_preloader("on");
+				$.ajax({
+					url: '{{ base_url("nodes_categories/refresh/") }}' + fbaccount + "/" + category,
+					dataType: 'json',
+					type: 'GET',
+					contentType: 'application/x-www-form-urlencoded',
+					success: function (data, textStatus, jQxhr) {
+						if (data.status == "ok") {
+							if (data.message !== null && typeof data.message === 'object') {
+								htmlData = "<ul>";
+								Object.keys(data.message).forEach(function (key) {
+									htmlData += "<li>" + data.message[key] + "</li>";
+								});
+								htmlData += "</ul>";
+
+							} else {
+								htmlData = data.message;
+							}
+							alertBox(htmlData, "success", false, true, true)
+						} else {
+							if (data.message !== null && typeof data.message === 'object') {
+								htmlData = "<ul>";
+								Object.keys(data.message).forEach(function (key) {
+									htmlData += "<li>" + data.message[key] + "</li>";
+								});
+								htmlData += "</ul>";
+							} else {
+								htmlData = data.message;
+							}
+							alertBox(htmlData, "danger", false, false, true);
+						}
+						$("#refreshCategory").prop('disabled', false);
+					},
+					error: function (jqXhr, textStatus, errorThrown) {
+						console.log(errorThrown);
+						alertBox("{{ l('Unable to complete your request, Please try again') }}", "danger", true, false, true);
+						$("#refreshCategory").prop('disabled', false);
+					},
+					complete: function () { kp_preloader("off"); }
+				});
+			});
+    </script>
+{% endblock %}

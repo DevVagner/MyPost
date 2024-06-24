@@ -1,0 +1,112 @@
+<div id="fbAccountsDowngrade" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">{{l("Account downgrade")}}</h4>
+      </div>
+      <div class="modal-body">
+        <p>{{l("Your are allowed to use %s accounts only", user_group.row('max_fbaccount')|number_format )}}, {{l("%s accounts Must be deleted","<span class='text-danger'>"~(total_fb_account-user_group.row('max_fbaccount'))~"</span>")|raw}}</p>
+
+        <ul class="fbAccounts row">
+
+        	{% set fbacounts = fbaccount.getAll() %}
+                
+            {% for fba in fbacounts %}
+            	<li class="col-md-6 fbar-{{ fba.fb_id }}">
+		            <div class="fbARow">
+		              <button type="button" value='{{ fba.fb_id }}' class="close deleteFbAccountBtn">×</button>
+		              <img src="https://graph.facebook.com/{{ fba.fb_id }}/picture?redirect=1&amp;height=40&amp;width=40&amp;type=normal" onerror="this.src = '{{ assets('theme/default/images/user-default.png') }}'">
+		              {{ fba.name|capitalize }}
+		            </div>
+		          </li>
+            {% endfor %}
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{{l("Close")}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Box variables #}
+{% set box_id = "dgFBAccountDeleteConfirmation" %}
+{% set delete_msg = l("Are you sure you want to delete the selected account?") %}
+{% include "blocks/delete_modal.twig" %}
+
+<style type="text/css">
+#fbAccountsDowngrade .fbAccounts {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    overflow: hidden;
+}
+
+#fbAccountsDowngrade .fbAccounts li {
+    margin: 0;
+    padding: 2px;
+}
+
+#fbAccountsDowngrade .fbAccounts li img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+#fbAccountsDowngrade .fbAccounts li .close {
+    color: #8d7d7d;
+    margin: 10px 0px;
+}
+
+.fbARow {
+    background: #f6f7f9;
+    margin: 2px 0px;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 0px 10px 0px 0px;
+}
+</style>
+
+<script type="text/javascript">
+$(function(){
+
+	$("#fbAccountsDowngrade").modal("show");
+
+	$(".deleteFbAccountBtn","#fbAccountsDowngrade").click(function(){
+		$("#delete_dgFBAccountDeleteConfirmation").modal("show");
+		deleteFbAccountBtn = $(this);
+    });
+
+    $(document).on('hide.bs.modal','#fbAccountsDowngrade', function () {location.reload();});
+
+    $(".deleteBtn_dgFBAccountDeleteConfirmation" ).click(function(){
+    	kp_preloader("on","#delete_dgFBAccountDeleteConfirmation .modal-body");
+	    $.ajax({
+	      url: '{{ base_url("facebook_accounts/home/delete") }}',
+	      dataType: 'json',
+	      type: 'post',
+	      contentType: 'application/x-www-form-urlencoded',
+	      data: { 
+	      	id: deleteFbAccountBtn.val(),
+	      	{{ config_item('csrf_token_name') }}: getCookie('{{ config_item('csrf_cookie_name') }}') 
+	      },
+	      success: function( data, textStatus, jQxhr ){
+	        if(data.status == "success"){
+	        	$(".fbar-"+deleteFbAccountBtn.val()).remove();
+	        	$("#delete_dgFBAccountDeleteConfirmation").modal("hide");
+	        }else{
+	        	alertBox(data.message,"danger",".deleteAlertBox_dgFBAccountDeleteConfirmation",false,false);
+	        }
+	      },
+	      error: function( jqXhr, textStatus, errorThrown ){ 
+	      	console.log(errorThrown);
+	      	alertBox("{{ l('Unable to complete your request') }}","danger",".deleteAlertBox_dgFBAccountDeleteConfirmation",false,false);
+	      },
+	      complete: function() {
+	      	kp_preloader("off","#delete_dgFBAccountDeleteConfirmation .modal-body");
+	      }
+	    });
+	});
+});
+</script>

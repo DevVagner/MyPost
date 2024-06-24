@@ -1,0 +1,99 @@
+<aside class="control-sidebar control-sidebar-dark">
+    <div class="tab-content">
+      <div class="tab-pane active" id="control-sidebar-home-tab">
+        <h3 class="control-sidebar-heading">{{l("Import settings")}}</h3>
+        {{form_open()}}
+        <ul class="control-sidebar-menu">
+          <li>
+            <div class="input-group">
+						{% if input_post(loadGroups) is not empty %}
+							{% set loadGroups = input_post("loadGroups") == "on" ? "checked" : "" %}
+						{% else %}
+							{% set loadGroups = userOptions.row('load_groups') == 1 ? "checked" : "" %}
+						{% endif %}
+						<label class="switch">
+							<input type="checkbox" class='checkbox-style' id="loadGroups" name="loadGroups" aria-label="{{ l('Load my groups') }}" {{ loadGroups }} />
+							<span class="slider round"></span>
+						</label>
+						<label for="loadGroups" class="input-text">{{ l('Load my groups') }}</label>
+					</div>
+          </li>
+
+          <li>
+            <div class="input-group">
+						{% if input_post(loadPages) is not empty %}
+							{% set loadPages = input_post("loadPages") == "on" ? "checked" : "" %}
+						{% else %}
+							{% set loadPages = userOptions.row('load_pages') == 1 ? "checked" : "" %}
+						{% endif %}
+						<label class="switch">
+							<input type="checkbox" class='checkbox-style' id="loadPages" name="loadPages" aria-label="{{ l('Load my pages') }}" {{ loadPages }} />
+							<span class="slider round"></span>
+						</label>
+						<label for="loadPages" class="input-text">{{ l('Load my pages') }}</label>
+					</div>
+          </li>
+
+          <li>
+            <div class="input-group">
+						{% if input_post(loadOwnPages) is not empty %}
+							{% set loadOwnPages = input_post("loadOwnPages") == "on" ? "checked" : "" %}
+						{% else %}
+							{% set loadOwnPages = userOptions.row('load_own_pages') == 1 ? "checked" : "" %}
+						{% endif %}
+						<label class="switch">
+							<input type="checkbox" class='checkbox-style' id="loadOwnPages" name="loadOwnPages" aria-label="{{ l('Load my own pages') }}" {{ loadOwnPages }} />
+							<span class="slider round"></span>
+						</label>
+						<label for="loadOwnPages" class="input-text">{{ l('Load my own pages') }}</label>
+					</div>
+          </li>
+
+          <li>
+           <div class="input-group">
+						{% if input_post(loadFbFriends) is not empty %}
+							{% set loadFbFriends = input_post("loadFbFriends") == "on" ? "checked" : "" %}
+						{% else %}
+							{% set loadFbFriends = userOptions.row('load_fb_friends') == 1 ? "checked" : "" %}
+						{% endif %}
+						<label class="switch">
+							<input type="checkbox" class='checkbox-style' id="loadFbFriends" name="loadFbFriends" aria-label="{{ l('Load Facebook Friends') }}" {{ loadFbFriends }} />
+							<span class="slider round"></span>
+						</label>
+						<label for="loadFbFriends" class="input-text">{{ l('Load Facebook Friends') }}</label>
+					</div>
+          </li>
+
+          <li>
+            <div class="input-group">
+								<label for="limitImportGroups">
+									{{ l('Maximum groups to import') }}
+								</label>
+								{% if input_post('limitImportGroups') is not empty %} 
+									{% set limitImportGroups = input_post('limitImportGroups') %}
+								{% else %}
+									{% set limitImportGroups = userOptions.row('limitImportGroups') %}
+								{% endif %}
+								<input name="limitImportGroups" id="limitImportGroups" type="number" value="{{  limitImportGroups }}" class="form-control"  min="1" max="5000">
+							</div>
+          </li>
+
+          <li>
+            <div class="input-group">
+								<label for="limitImportPages">
+									{{ l('Maximum pages to import') }}
+								</label>
+								{% if input_post('limitImportPages') is not empty %} 
+									{% set limitImportPages = input_post('limitImportPages') %}
+								{% else %}
+									{% set limitImportPages = userOptions.row('limitImportPages') %}
+								{% endif %}
+								<input name="limitImportPages" id="limitImportPages" type="number" value="{{ limitImportPages }}" class="form-control"  min="1" max="5000">
+							</div>
+          </li>
+          <li><input type="submit" name="save" value="{{ l('Save changes') }}" class="btn btn-primary" /></li>
+        </ul>
+        </form>
+      </div>
+    </div>
+  </aside>

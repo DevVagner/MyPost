@@ -1,0 +1,82 @@
+<div class="panel panel-default">
+<div class="panel-heading">
+  <h4 class="panel-title">
+    <a data-toggle="collapse" data-parent="#accordion" href="#cron_jobs">
+    <i class="fa fa-envelope" aria-hidden="true"></i>
+  <span>{{ l('Cron jobs') }}</span></a>
+  </h4>
+</div>
+<div id="cron_jobs" class="panel-collapse collapse">
+  <div class="panel-body">
+    <div class="row">
+        <div class="col-md-12">
+          <div class="input-group">
+          <div>{{l("Schedule post cronjob tab")}} : </div>
+          <input type="text" class="form-control" style="color:darkred" value="wget -O --spider {{base_url("schedules/schedule_run")}}">
+          </div>
+        </div>
+        
+        {% if KPMIsActive('join_groups') %}
+        <div class="col-md-12">
+          <div class="input-group">
+          <div>{{l("Auto join groups cronjob tab")}} : </div>
+          <input type="text" class="form-control" style="color:darkred" value="wget -O --spider {{base_url("join_groups/schedule_run")}}">
+          </div>
+        </div>
+        {% endif %}
+
+        {% if KPMIsActive('invite_join_groups') %}
+        <div class="col-md-12">
+          <div class="input-group">
+          <div>{{l("Auto add friends cronjob tab")}} : </div>
+          <input type="text" class="form-control" style="color:darkred" value="wget -O --spider {{base_url("invite_join_groups/schedule_run")}}">
+          </div>
+        </div>
+        {% endif %}
+
+        {% if KPMIsActive('auto_comment') %}
+        <div class="col-md-12">
+          <div class="input-group">
+          <div>{{l("Auto comment cronjob tab")}} : </div>
+          <input type="text" class="form-control" style="color:darkred" value="wget -O --spider {{base_url("comments/schedule_run")}}">
+          </div>
+        </div>
+        {% endif %}
+
+        {% if KPMIsActive('autolike') %}
+        <div class="col-md-12">
+          <div class="input-group">
+          <div>{{l("Auto like cronjob tab")}} : </div>
+          <small><input type="text" class="form-control" style="color:darkred" value="wget -O --spider {{base_url("autolike/schedule_run")}}"></small>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-md-12">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">{{l("Your current Cron tabs")}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% if crontabs is iterable %}
+                      {% for crontab in crontabs %}
+                        <tr><td>{{crontab}}</td></tr>
+                      {% else %}
+                        <tr><td>{{l("No crontabs found")}}</td></tr>
+                      {% endfor %}
+                    {% else %}
+                      <tr><td>{{l('Can not fetch your cron tabs list, Getting cron tabs not allowed or cron job not supported on your server')}}</td></tr>
+                    {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+</div>
